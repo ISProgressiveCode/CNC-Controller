@@ -23,7 +23,7 @@ inline void axis_controller_init(struct axis_controller* axis_controller, enum h
 
 inline int axis_controller_clean(struct axis_controller* axis_controller);
 
-inline void axis_controller_change_state(struct axis_controller* axis_controller, unsigned long sec, unsigned long nano_sec);
+inline enum hrtimer_restart axis_controller_change_state(struct axis_controller* axis_controller);
 
 inline void axis_controller_controll(struct axis_controller* axis_controller);
 

@@ -10,7 +10,7 @@ static struct axis_controller test;
 
 static enum hrtimer_restart my_callback(struct hrtimer *timer) {
   printk("my_hrtimer_callback called\n");
-  return HRTIMER_NORESTART;
+  return axis_controller_change_state(&test);
 }
 
 static int __init on_load(void) {

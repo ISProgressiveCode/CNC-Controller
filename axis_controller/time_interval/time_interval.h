@@ -15,6 +15,8 @@ inline void time_interval_init(struct time_interval* time_interval);
 
 inline int time_interval_enqueue(struct time_interval* time_interval, unsigned long sec, unsigned long nano_sec);
 
+inline int time_interval_not_empty(struct time_interval* time_interval);
+
 inline int time_interval_dequeue(struct time_interval* time_interval);
 
 #endif

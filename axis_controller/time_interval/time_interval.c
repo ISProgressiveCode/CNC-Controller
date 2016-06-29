@@ -1,6 +1,8 @@
 #include "time_interval.h"
 #include <linux/slab.h>
 
+MODULE_LICENSE("GPL v2");
+
 struct list_head* __time_interval_get_list(struct time_interval* time_interval) {
     return &(time_interval->list);
 }
@@ -21,11 +23,15 @@ int time_interval_enqueue(struct time_interval* time_interval, unsigned long sec
     return 0;
 }
 
+int time_interval_not_empty(struct time_interval* time_interval) {
+    return !list_empty(__time_interval_get_list(time_interval));
+}
+
 int time_interval_dequeue(struct time_interval* time_interval) {
-    int empty = list_empty(__time_interval_get_list(time_interval));
-    if(!empty) {
+    int not_empty = time_interval_not_empty(time_interval);
+    if(not_empty) {
         list_del(__time_interval_get_list(time_interval));
         kfree(time_interval);
     }
-    return empty;
+    return !not_empty;
 }
