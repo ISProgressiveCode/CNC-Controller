@@ -29,14 +29,14 @@ int axis_controller_clean(struct axis_controller* axis_controller) {
 
 enum hrtimer_restart axis_controller_change_state(struct axis_controller* axis_controller) {
     struct time_interval* interval = axis_controller_get_interval(axis_controller);
+    axis_controller->state = !axis_controller->state;
+    if(axis_controller->state) {
+        printk("ON\n");
+    } else {
+        printk("OFF\n");
+    }
     if(time_interval_not_empty(interval)) {
-        axis_controller->state = !axis_controller->state;
-        if(axis_controller->state) {
-            printk("ON\n");
-        } else {
-            printk("OFF\n");
-        }
-        hrtimer_start(__axis_controller_get_timer(axis_controller), ktime_set(interval->sec, interval->nano_sec), HRTIMER_MODE_REL);
+        //hrtimer_start(__axis_controller_get_timer(axis_controller), ktime_set(interval->sec, interval->nano_sec), HRTIMER_MODE_REL);
         time_interval_dequeue(interval);
     }
     return HRTIMER_NORESTART;
@@ -45,4 +45,8 @@ enum hrtimer_restart axis_controller_change_state(struct axis_controller* axis_c
 void axis_controller_controll(struct axis_controller* axis_controller) {
     __axis_controller_reset_state(axis_controller);
     axis_controller->timer.function(__axis_controller_get_timer(axis_controller));
+}
+
+int axis_controller_add_interval(struct axis_controller* axis_controller, unsigned long sec, unsigned long nano_sec) {
+    return time_interval_enqueue(axis_controller_get_interval(axis_controller), sec, nano_sec);
 }

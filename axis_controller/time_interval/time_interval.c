@@ -30,8 +30,10 @@ int time_interval_not_empty(struct time_interval* time_interval) {
 int time_interval_dequeue(struct time_interval* time_interval) {
     int not_empty = time_interval_not_empty(time_interval);
     if(not_empty) {
-        list_del(__time_interval_get_list(time_interval));
-        kfree(time_interval);
+        struct list_head* old_list = __time_interval_get_list(time_interval);
+        struct time_interval* interval = list_entry(old_list, struct time_interval, list);
+        list_del(old_list);
+        kfree(interval);
     }
     return !not_empty;
 }

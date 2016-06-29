@@ -27,4 +27,7 @@ inline enum hrtimer_restart axis_controller_change_state(struct axis_controller*
 
 inline void axis_controller_controll(struct axis_controller* axis_controller);
 
+inline int axis_controller_add_interval(struct axis_controller* axis_controller, unsigned long sec, unsigned long nano_sec);
+
+
 #endif
