@@ -4,7 +4,8 @@ __major__ = 243
 __ioctl_header__ = /usr/include/$(__name__)_ioctl.h
 make_module_action = make -C /lib/modules/$(shell uname -r)/build M=$(PWD)
 obj-m := $(__name__).o
-cnc_controller-objs := axis_controller/axis_controller.o CNC_controller.o
+cnc_controller-objs := axis_controller/time_interval/time_interval.o axis_controller/axis_controller.o CNC_controller.o
+axis_controller/axis_controller-objs := axis_controller/time_interval/time_interval.o
 
 all: clean
 	$(make_module_action) modules
