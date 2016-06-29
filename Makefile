@@ -1,13 +1,16 @@
-__name__ = CNC_Controller
+#Makefile
+__name__ = cnc_controller
 __major__ = 243
+__ioctl_header__ = /usr/include/$(__name__)_ioctl.h
+make_module_action = make -C /lib/modules/$(shell uname -r)/build M=$(PWD)
 obj-m := $(__name__).o
-
+cnc_controller-objs := axis_controller/axis_controller.o CNC_controller.o
 
 all: clean
-	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
+	$(make_module_action) modules
 
 clean:
-	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
+	$(make_module_action) clean
 
 load:
 	insmod $(__name__).ko
@@ -23,6 +26,6 @@ remove:
 	rm -f /dev/$(__name__)
 
 header:
-	rm -f /usr/include/$(__name__)_ioctl.h
-	cp $(__name__).h /usr/include/$(__name__)_ioctl.h
-	chmod 555 /usr/include/$(__name__)_ioctl.h
+	rm -f $(__ioctl_header__)
+	cp $(__name__).h $(__ioctl_header__)
+	chmod 555 $(__ioctl_header__)
