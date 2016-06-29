@@ -36,7 +36,7 @@ enum hrtimer_restart axis_controller_change_state(struct axis_controller* axis_c
         printk("OFF\n");
     }
     if(time_interval_not_empty(interval)) {
-        //hrtimer_start(__axis_controller_get_timer(axis_controller), ktime_set(interval->sec, interval->nano_sec), HRTIMER_MODE_REL);
+        hrtimer_start(__axis_controller_get_timer(axis_controller), ktime_set(interval->sec, interval->nano_sec), HRTIMER_MODE_REL);
         time_interval_dequeue(interval);
     }
     return HRTIMER_NORESTART;

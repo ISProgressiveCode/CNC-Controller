@@ -9,16 +9,30 @@ static int return_value;
 static struct axis_controller test;
 
 static enum hrtimer_restart my_callback(struct hrtimer *timer) {
-  printk("my_hrtimer_callback called\n");
   return axis_controller_change_state(&test);
 }
 
 static int __init on_load(void) {
   printk("on_load\n");
   axis_controller_init(&test, my_callback);
-  axis_controller_add_interval(&test, 1, 10000);
+  axis_controller_add_interval(&test, 0, 100000000);
+  axis_controller_add_interval(&test, 0, 10000000);
+  axis_controller_add_interval(&test, 0, 1000000);
+  axis_controller_add_interval(&test, 0, 100000);
+  axis_controller_add_interval(&test, 0, 10000);
+  axis_controller_add_interval(&test, 0, 1000);
+  axis_controller_add_interval(&test, 0, 100);
+  axis_controller_add_interval(&test, 0, 10);
+  axis_controller_add_interval(&test, 0, 1);
+  axis_controller_add_interval(&test, 0, 10);
+  axis_controller_add_interval(&test, 0, 100);
+  axis_controller_add_interval(&test, 0, 1000);
+  axis_controller_add_interval(&test, 0, 10000);
+  axis_controller_add_interval(&test, 0, 100000);
+  axis_controller_add_interval(&test, 0, 1000000);
+  axis_controller_add_interval(&test, 0, 10000000);
+  axis_controller_add_interval(&test, 0, 100000000);
   axis_controller_controll(&test);
-
   return 0;
 }
 
