@@ -1,17 +1,28 @@
-#include "time_interval.h"
+#ifndef _TIME_INTERVAL_H
+#define  _TIME_INTERVAL_H
+
+#include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/list.h>
 #include <linux/slab.h>
 
 MODULE_LICENSE("GPL v2");
 
-struct list_head* __time_interval_get_list(struct time_interval* time_interval) {
+struct time_interval {
+    unsigned long sec;
+    unsigned long nano_sec;
+    struct list_head list;
+};
+
+static inline struct list_head* __time_interval_get_list(struct time_interval* time_interval) {
     return &(time_interval->list);
 }
 
-void time_interval_init(struct time_interval* time_interval) {
+static inline void time_interval_init(struct time_interval* time_interval) {
     INIT_LIST_HEAD(__time_interval_get_list(time_interval));
 }
 
-int time_interval_enqueue(struct time_interval* time_interval, unsigned long sec, unsigned long nano_sec) {
+static inline int time_interval_enqueue(struct time_interval* time_interval, unsigned long sec, unsigned long nano_sec) {
     struct time_interval* new_time_interval = kmalloc(sizeof(*time_interval), GFP_KERNEL);
     if(!new_time_interval) {
         return 1;
@@ -23,11 +34,11 @@ int time_interval_enqueue(struct time_interval* time_interval, unsigned long sec
     return 0;
 }
 
-int time_interval_not_empty(struct time_interval* time_interval) {
+static inline int time_interval_not_empty(struct time_interval* time_interval) {
     return !list_empty(__time_interval_get_list(time_interval));
 }
 
-int time_interval_dequeue(struct time_interval* time_interval) {
+static inline int time_interval_dequeue(struct time_interval* time_interval) {
     int not_empty = time_interval_not_empty(time_interval);
     if(not_empty) {
         struct time_interval* interval = list_first_entry(__time_interval_get_list(time_interval), struct time_interval, list);
@@ -36,3 +47,5 @@ int time_interval_dequeue(struct time_interval* time_interval) {
     }
     return !not_empty;
 }
+
+#endif

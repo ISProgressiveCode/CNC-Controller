@@ -1,5 +1,5 @@
 //CNC_controller.c
-#include "axis_controller/axis_controller.h"
+#include "axis_controller.h"
 
 MODULE_LICENSE("GPL v2");
 MODULE_AUTHOR("Ivo Stratev (NoHomey)");

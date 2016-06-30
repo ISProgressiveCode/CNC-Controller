@@ -33,4 +33,4 @@
 *.su
 
 # VS Code
-.vscode/
+*.vscode/
