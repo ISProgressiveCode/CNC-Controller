@@ -30,13 +30,14 @@ static inline struct pin_change* __axis_controller_get_pulse(struct axis_control
 
 static inline struct pin_change* __axis_controller_get_dir(struct axis_controller* axis_controller) {
     return &(axis_controller->dir);
-} 
+}
 
 static inline void axis_controller_init(struct axis_controller* axis_controller, int pulse, int dir, axis_controller_function function) {
+    __pin_change_line();
     hrtimer_init(__axis_controller_get_timer(axis_controller), CLOCK_MONOTONIC, HRTIMER_MODE_REL);
     axis_controller->timer.function = function;
-    pin_change_init(__axis_controller_get_pulse(axis_controller), pulse);
-    pin_change_init(__axis_controller_get_dir(axis_controller), dir);
+    pin_change_init(__axis_controller_get_pulse(axis_controller), pulse, 0);
+    pin_change_init(__axis_controller_get_dir(axis_controller), dir, 1);
     axis_controller->counter = 0;
 }
 
@@ -56,7 +57,7 @@ static inline void axis_controller_count(struct axis_controller* axis_controller
 
 static inline int __axis_controller_pulse_change(struct axis_controller* axis_controller, unsigned long width) {
     axis_controller_count(axis_controller);
-    return pin_change_add_change(__axis_controller_get_pulse(axis_controller), width);
+    return pin_change_add_change(__axis_controller_get_pulse(axis_controller), width * 1000);
 }
 
 static inline int axis_controller_add_pulse_change(struct axis_controller* axis_controller, unsigned long count, unsigned long width) {
@@ -76,12 +77,9 @@ static inline int axis_controller_add_dir_change(struct axis_controller* axis_co
 }
 
 static inline void axis_controller_controll(struct axis_controller* axis_controller) {
-    struct pin_change* dir = __axis_controller_get_dir(axis_controller);
-    printk("DIR:       OFF\n");
-    printk("PULSE:     OFF\n");
+    __pin_change_line();
     pin_change_reset_state(__axis_controller_get_pulse(axis_controller));
-    pin_change_reset_state(dir);
-    pin_change_change_state(dir);
+    pin_change_reset_state(__axis_controller_get_dir(axis_controller));
     axis_controller_begin(axis_controller);
     axis_controller->timer.function(__axis_controller_get_timer(axis_controller));
 }
@@ -97,7 +95,7 @@ static inline enum hrtimer_restart axis_controller_change_state(struct axis_cont
     }
     pin_change_change_state(pulse);
     if(pin_change_extract_data(pulse)) {
-        printk("TIMER:     %lu\n", timeout);
+        printk("TIMER :                        %lu  ms\n", timeout / 1000);
         axis_controller_count(axis_controller);
         hrtimer_start(__axis_controller_get_timer(axis_controller), ktime_set(0, timeout), HRTIMER_MODE_REL);
     }
