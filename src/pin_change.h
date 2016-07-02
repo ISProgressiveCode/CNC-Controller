@@ -27,7 +27,7 @@ static inline void pin_change_init(struct pin_change* pin_change, int pin) {
 
 static inline void pin_change_clean(struct pin_change* pin_change) {
     pin_change->state = 0;
-    while(!uint_queue_dequeue(__pin_change_get_queue(pin_change)));
+    while(uint_queue_dequeue(__pin_change_get_queue(pin_change)));
 }
 
 static inline void pin_change_change_state(struct pin_change* pin_change) {

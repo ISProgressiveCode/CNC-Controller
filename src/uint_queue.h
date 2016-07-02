@@ -51,7 +51,7 @@ static inline int uint_queue_dequeue(struct uint_queue* uint_queue) {
         list_del(__uint_queue_get_list(old_uint_queue));
         kfree(old_uint_queue);
     }
-    return !not_empty;
+    return not_empty;
 }
 
 #endif
