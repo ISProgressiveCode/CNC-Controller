@@ -16,7 +16,6 @@ load:
 	dmesg -c
 	clear
 	insmod $(__name__).ko
-	dmesg
 
 unload:
 	rmmod -f $(__name__)

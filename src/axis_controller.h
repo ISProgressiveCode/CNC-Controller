@@ -93,9 +93,9 @@ static inline enum hrtimer_restart axis_controller_change_state(struct axis_cont
         pin_change_change_state(dir);
         axis_controller_begin(axis_controller);
     }
-    pin_change_change_state(pulse);
-    if(pin_change_extract_data(pulse)) {
-        printk("TIMER :                        %lu  ms\n", timeout / 1000);
+    if(timeout) {
+        pin_change_change_state(pulse);
+        printk("TIMER :                        %lu  us\n", timeout / 1000);
         axis_controller_count(axis_controller);
         hrtimer_start(__axis_controller_get_timer(axis_controller), ktime_set(0, timeout), HRTIMER_MODE_REL);
     }
