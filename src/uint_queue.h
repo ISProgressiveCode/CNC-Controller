@@ -36,10 +36,18 @@ static inline int uint_queue_not_empty(struct uint_queue* uint_queue) {
     return !list_empty(__uint_queue_get_list(uint_queue));
 }
 
+static inline struct uint_queue* uint_queue_first(struct uint_queue* uint_queue) {
+    return list_first_entry(__uint_queue_get_list(uint_queue), struct uint_queue, list);
+}
+
+static inline unsigned long uint_queue_first_data(struct uint_queue* uint_queue) {
+    return (uint_queue_first(uint_queue))->data;
+}
+
 static inline int uint_queue_dequeue(struct uint_queue* uint_queue) {
     int not_empty = uint_queue_not_empty(uint_queue);
     if(not_empty) {
-        struct uint_queue* old_uint_queue = list_first_entry(__uint_queue_get_list(uint_queue), struct uint_queue, list);
+        struct uint_queue* old_uint_queue = uint_queue_first(uint_queue);
         list_del(__uint_queue_get_list(old_uint_queue));
         kfree(old_uint_queue);
     }

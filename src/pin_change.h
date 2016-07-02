@@ -32,7 +32,7 @@ static inline void pin_change_clean(struct pin_change* pin_change) {
 
 static inline void pin_change_change_state(struct pin_change* pin_change) {
     pin_change->state = !pin_change->state;
-    printk("Changing: state, for pin: %d\n", pin_change->pin);
+    printk("Changing state for pin: %d\n", pin_change->pin);
 }
 
 static inline int pin_change_add_change(struct pin_change* pin_change, unsigned long data) {
@@ -41,7 +41,7 @@ static inline int pin_change_add_change(struct pin_change* pin_change, unsigned 
 
 static inline unsigned long pin_change_extract_data(struct pin_change* pin_change) {
     struct uint_queue* queue = __pin_change_get_queue(pin_change);
-    return uint_queue_not_empty(queue) ? queue->data : 0;
+    return uint_queue_not_empty(queue) ? uint_queue_first_data(queue) : 0;
 }
 
 static inline void pin_change_remove_data(struct pin_change* pin_change) {
