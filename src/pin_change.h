@@ -1,6 +1,8 @@
 #ifndef _PIN_CHANGE_H
 #define _PIN_CHANGE_H
 
+
+#include <linux/gpio.h>
 #include "uint_queue.h"
 
 MODULE_LICENSE("GPL v2");
@@ -12,47 +14,39 @@ struct pin_change {
     struct uint_queue queue;
 };
 
-static inline void __pin_change_line(void) {
-    printk("---------------------\n");
-}
-
-static inline void __pin_change_print(struct pin_change* pin_change) {
-    if(pin_change->pin) {
-        printk("DIR   :           ");
-    } else {
-        printk("PULSE :           ");
-    }
-    if(pin_change->state) {
-        printk("ON \n");
-    } else {
-        printk("OFF\n");
-    }
-}
-
 static inline struct uint_queue* __pin_change_get_queue(struct pin_change* pin_change) {
     return &(pin_change->queue);
 }
 
+static inline void pin_change_change_pin_state(struct pin_change* pin_change) {
+    gpio_set_value(pin_change->pin, pin_change->state);
+}
+
 static inline void pin_change_reset_state(struct pin_change* pin_change) {
     pin_change->state = pin_change->passive;
-    __pin_change_print(pin_change);
+    pin_change_change_pin_state(pin_change);
 }
 
 static inline void pin_change_init(struct pin_change* pin_change, int pin, int passive) {
     pin_change->pin = pin;
+    pin_change->state = passive;
     pin_change->passive = passive;
-    pin_change_reset_state(pin_change);
+    if(gpio_request(pin, "cnc_controller pin")) {
+        printk(KERN_ERR "Fail to request gpio %d\n", pin);
+        return;
+    }
+    gpio_direction_output(pin, passive);
     uint_queue_init(__pin_change_get_queue(pin_change));
 }
 
 static inline void pin_change_clean(struct pin_change* pin_change) {
-    pin_change->state = 0;
+    gpio_free(pin_change->pin);
     while(uint_queue_dequeue(__pin_change_get_queue(pin_change)));
 }
 
 static inline void pin_change_change_state(struct pin_change* pin_change) {
     pin_change->state = !pin_change->state;
-    __pin_change_print(pin_change);
+    pin_change_change_pin_state(pin_change);
 }
 
 static inline int pin_change_add_change(struct pin_change* pin_change, unsigned long data) {

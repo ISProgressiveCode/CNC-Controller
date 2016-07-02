@@ -33,7 +33,6 @@ static inline struct pin_change* __axis_controller_get_dir(struct axis_controlle
 }
 
 static inline void axis_controller_init(struct axis_controller* axis_controller, int pulse, int dir, axis_controller_function function) {
-    __pin_change_line();
     hrtimer_init(__axis_controller_get_timer(axis_controller), CLOCK_MONOTONIC, HRTIMER_MODE_REL);
     axis_controller->timer.function = function;
     pin_change_init(__axis_controller_get_pulse(axis_controller), pulse, 0);
@@ -77,7 +76,6 @@ static inline int axis_controller_add_dir_change(struct axis_controller* axis_co
 }
 
 static inline void axis_controller_controll(struct axis_controller* axis_controller) {
-    __pin_change_line();
     pin_change_reset_state(__axis_controller_get_pulse(axis_controller));
     pin_change_reset_state(__axis_controller_get_dir(axis_controller));
     axis_controller_begin(axis_controller);
@@ -95,7 +93,6 @@ static inline enum hrtimer_restart axis_controller_change_state(struct axis_cont
     }
     if(timeout) {
         pin_change_change_state(pulse);
-        printk("TIMER :                        %lu  us\n", timeout / 1000);
         axis_controller_count(axis_controller);
         hrtimer_start(__axis_controller_get_timer(axis_controller), ktime_set(0, timeout), HRTIMER_MODE_REL);
     }
