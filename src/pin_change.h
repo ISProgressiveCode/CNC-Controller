@@ -18,13 +18,13 @@ static inline struct uint_queue* __pin_change_get_queue(struct pin_change* pin_c
     return &(pin_change->queue);
 }
 
-static inline void pin_change_change_pin_state(struct pin_change* pin_change) {
+static inline void __pin_change_change_pin_state(struct pin_change* pin_change) {
     gpio_set_value(pin_change->pin, pin_change->state);
 }
 
 static inline void pin_change_reset_state(struct pin_change* pin_change) {
     pin_change->state = pin_change->passive;
-    pin_change_change_pin_state(pin_change);
+    __pin_change_change_pin_state(pin_change);
 }
 
 static inline void pin_change_init(struct pin_change* pin_change, int pin, int passive) {
@@ -46,7 +46,7 @@ static inline void pin_change_clean(struct pin_change* pin_change) {
 
 static inline void pin_change_change_state(struct pin_change* pin_change) {
     pin_change->state = !pin_change->state;
-    pin_change_change_pin_state(pin_change);
+    __pin_change_change_pin_state(pin_change);
 }
 
 static inline int pin_change_add_change(struct pin_change* pin_change, unsigned long data) {

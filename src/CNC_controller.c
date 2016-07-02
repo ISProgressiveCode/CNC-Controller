@@ -15,7 +15,7 @@ static enum hrtimer_restart my_callback(struct hrtimer *timer) {
 
 static int __init on_load(void) {
   printk("on_load\n");
-  axis_controller_init(&test, 0, 1, my_callback);
+  axis_controller_init(&test, 22, 17, my_callback);
   axis_controller_begin(&test);
   axis_controller_add_pulse_change(&test, 100, 5000);
   axis_controller_add_dir_change(&test);
