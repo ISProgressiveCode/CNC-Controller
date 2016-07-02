@@ -63,15 +63,15 @@ static inline enum hrtimer_restart axis_controller_change_state(struct axis_cont
     struct pin_change* pulse = __axis_controller_get_pulse(axis_controller);
     struct pin_change* dir = __axis_controller_get_dir(axis_controller);
     unsigned long timeout = pin_change_take_data(pulse);
-    pin_change_change_state(pulse);
-    if(timeout) {
-        ++axis_controller->counter;
-        hrtimer_start(__axis_controller_get_timer(axis_controller), ktime_set(0, timeout), HRTIMER_MODE_REL);
-    }
     if(axis_controller->counter && (axis_controller->counter == pin_change_extract_data(dir))) {
         pin_change_remove_data(dir);
         pin_change_change_state(dir);
         axis_controller->counter = 0;
+    }
+    pin_change_change_state(pulse);
+    if(timeout) {
+        ++axis_controller->counter;
+        hrtimer_start(__axis_controller_get_timer(axis_controller), ktime_set(0, timeout), HRTIMER_MODE_REL);
     }
     return HRTIMER_NORESTART;
 }

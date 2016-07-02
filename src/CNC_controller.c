@@ -15,8 +15,14 @@ static enum hrtimer_restart my_callback(struct hrtimer *timer) {
 
 static int __init on_load(void) {
   printk("on_load\n");
-  axis_controller_init(&test, 10, 20, my_callback);
+  axis_controller_init(&test, 1, 1000000, my_callback);
   printk("adding dir: %d\n", axis_controller_add_dir_change(&test, 3));
+  printk("adding dir: %d\n", axis_controller_add_dir_change(&test, 2));
+  printk("adding pulse: %d\n", axis_controller_add_pulse_change(&test, 10));
+  printk("adding pulse: %d\n", axis_controller_add_pulse_change(&test, 10));
+  printk("adding pulse: %d\n", axis_controller_add_pulse_change(&test, 10));
+  printk("adding pulse: %d\n", axis_controller_add_pulse_change(&test, 10));
+  printk("adding pulse: %d\n", axis_controller_add_pulse_change(&test, 10));
   printk("adding pulse: %d\n", axis_controller_add_pulse_change(&test, 10));
   printk("adding pulse: %d\n", axis_controller_add_pulse_change(&test, 10));
   printk("adding pulse: %d\n", axis_controller_add_pulse_change(&test, 10));

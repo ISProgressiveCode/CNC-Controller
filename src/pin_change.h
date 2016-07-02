@@ -32,7 +32,11 @@ static inline void pin_change_clean(struct pin_change* pin_change) {
 
 static inline void pin_change_change_state(struct pin_change* pin_change) {
     pin_change->state = !pin_change->state;
-    printk("Changing state for pin: %d\n", pin_change->pin);
+    if(pin_change->state) {
+        printk("ON: pin %d\n", pin_change->pin);
+    } else {
+        printk("OFF: pin %d\n", pin_change->pin);
+    }
 }
 
 static inline int pin_change_add_change(struct pin_change* pin_change, unsigned long data) {
