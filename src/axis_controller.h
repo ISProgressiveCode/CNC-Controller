@@ -7,6 +7,8 @@
 #include <linux/ktime.h>
 #include "pin_change.h"
 
+#define PULSE_WIDTH 10
+
 MODULE_LICENSE("GPL v2");
 
 typedef enum hrtimer_restart (*axis_controller_function)(struct hrtimer*);
@@ -44,18 +46,43 @@ static inline int axis_controller_clean(struct axis_controller* axis_controller)
     return hrtimer_try_to_cancel(__axis_controller_get_timer(axis_controller));
 }
 
-static inline int axis_controller_add_pulse_change(struct axis_controller* axis_controller, unsigned long after) {
-    return pin_change_add_change(__axis_controller_get_pulse(axis_controller), after);
+static inline void axis_controller_begin(struct axis_controller* axis_controller) {
+    axis_controller->counter = 0;
 }
 
-static inline int axis_controller_add_dir_change(struct axis_controller* axis_controller, unsigned long after) {
-    return pin_change_add_change(__axis_controller_get_dir(axis_controller), after);
+static inline void axis_controller_count(struct axis_controller* axis_controller) {
+    ++axis_controller->counter;
+}
+
+static inline int __axis_controller_pulse_change(struct axis_controller* axis_controller, unsigned long width) {
+    axis_controller_count(axis_controller);
+    return pin_change_add_change(__axis_controller_get_pulse(axis_controller), width);
+}
+
+static inline int axis_controller_add_pulse_change(struct axis_controller* axis_controller, unsigned long count, unsigned long width) {
+    unsigned long i;
+    for(i = 0; i < count; ++i) {
+        if(__axis_controller_pulse_change(axis_controller, PULSE_WIDTH) || __axis_controller_pulse_change(axis_controller, width)) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+static inline int axis_controller_add_dir_change(struct axis_controller* axis_controller) {
+    int change = pin_change_add_change(__axis_controller_get_dir(axis_controller), axis_controller->counter);
+    axis_controller_begin(axis_controller);
+    return change;
 }
 
 static inline void axis_controller_controll(struct axis_controller* axis_controller) {
+    struct pin_change* dir = __axis_controller_get_dir(axis_controller);
+    printk("DIR:       OFF\n");
+    printk("PULSE:     OFF\n");
     pin_change_reset_state(__axis_controller_get_pulse(axis_controller));
-    pin_change_reset_state(__axis_controller_get_dir(axis_controller));
-    axis_controller->counter = 0;
+    pin_change_reset_state(dir);
+    pin_change_change_state(dir);
+    axis_controller_begin(axis_controller);
     axis_controller->timer.function(__axis_controller_get_timer(axis_controller));
 }
 
@@ -66,11 +93,12 @@ static inline enum hrtimer_restart axis_controller_change_state(struct axis_cont
     if(axis_controller->counter && (axis_controller->counter == pin_change_extract_data(dir))) {
         pin_change_remove_data(dir);
         pin_change_change_state(dir);
-        axis_controller->counter = 0;
+        axis_controller_begin(axis_controller);
     }
     pin_change_change_state(pulse);
-    if(timeout) {
-        ++axis_controller->counter;
+    if(pin_change_extract_data(pulse)) {
+        printk("TIMER:     %lu\n", timeout);
+        axis_controller_count(axis_controller);
         hrtimer_start(__axis_controller_get_timer(axis_controller), ktime_set(0, timeout), HRTIMER_MODE_REL);
     }
     return HRTIMER_NORESTART;
