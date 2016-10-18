@@ -1,4 +1,4 @@
-//CNC_controller.c
+//cnc_controller.c
 #include "axis_controller.h"
 
 MODULE_LICENSE("GPL v2");

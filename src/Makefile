@@ -4,7 +4,6 @@ __major__ = 243
 __ioctl_header__ = /usr/include/$(__name__)_ioctl.h
 make_module_action = make -C /lib/modules/$(shell uname -r)/build M=$(PWD)
 obj-m := $(__name__).o
-cnc_controller-objs := CNC_controller.o
 
 all: clean
 	$(make_module_action) modules
